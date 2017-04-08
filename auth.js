@@ -66,10 +66,15 @@ module.exports.paypal = function (path, token, method, body) {
     headers: {
       'Accept': 'application/json',
       'Accept-Language': 'en_US',
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': token ? 'application/json' : 'application/x-www-form-urlencoded',
       'Authorization': authentication
     },
     body
   })
-  .then(r => r.json())
+  .then(r => {
+    if (r.status >= 300) {
+      throw r.sjon()
+    }
+    return r.status !== 204 ? r.json() : null
+  })
 }
